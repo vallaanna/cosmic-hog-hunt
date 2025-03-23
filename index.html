@@ -599,10 +599,12 @@
             }
             
             // Handle window resize to adjust hedgehog area position
-            window.addEventListener('resize', function() {
+window.addEventListener('resize', function() {
     // Always setup hedgehog area on resize, even if game hasn't started
     setupHedgehogArea();
-                }
+});
+            
+// Make sure the image is loaded before setting up the game
             
             // Make sure the image is loaded before setting up the game
             gameImage.onload = function() {
