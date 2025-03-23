@@ -294,6 +294,28 @@ function setupHedgehogArea() {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Game elements
+            // Add this right after the document.addEventListener('DOMContentLoaded', function() { line
+// and before any other game setup code
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Game elements
+    const gameContainer = document.getElementById('gameContainer');
+    const gameImage = document.getElementById('gameImage');
+    
+    // Add this new click position logger here:
+    gameImage.addEventListener('click', function(event) {
+        const rect = gameImage.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        
+        // Calculate percentages
+        const percentX = (x / rect.width * 100).toFixed(2);
+        const percentY = (y / rect.height * 100).toFixed(2);
+        
+        console.log(`Clicked at: x=${x}px, y=${y}px (${percentX}%, ${percentY}%)`);
+    });
+    
+    // Rest of your existing code...
             const gameContainer = document.getElementById('gameContainer');
             const gameImage = document.getElementById('gameImage');
             const timerElement = document.getElementById('timer');
