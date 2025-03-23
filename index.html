@@ -108,8 +108,8 @@
         
         .click-feedback {
             position: absolute;
-            width: 10px;
-            height: 10px;
+            width: 30px;
+            height: 30px;
             border: 2px solid red;
             border-radius: 50%;
             pointer-events: none;
@@ -117,7 +117,7 @@
         }
         
         /* Popup styles */
-        .found-popup {
+        .found-popup, .not-found-popup {
             position: fixed;
             top: 50%;
             left: 50%;
@@ -131,6 +131,34 @@
             display: none;
             width: 500px;
             animation: pop-in 0.3s ease-out;
+            position: relative;
+        }
+        
+        .not-found-popup {
+            width: 400px;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background-color: #f54e00;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 18px;
+            line-height: 1;
+            border: none;
+        }
+        
+        .close-btn:hover {
+            background-color: #d44400;
         }
         
         @keyframes pop-in {
@@ -144,7 +172,7 @@
             font-size: 28px;
         }
         
-        .found-popup p {
+        .found-popup p, .not-found-popup p {
             margin-bottom: 20px;
             font-size: 18px;
             line-height: 1.5;
@@ -205,22 +233,6 @@
             line-height: 1.5;
         }
         
-        .not-found-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-            padding: 30px;
-            text-align: center;
-            z-index: 200;
-            display: none;
-            width: 400px;
-            animation: pop-in 0.3s ease-out;
-        }
-        
         .not-found-popup h3 {
             color: #f54e00;
             margin-top: 0;
@@ -264,6 +276,7 @@
             </div>
             
             <div class="game-over" id="gameOver">
+                <button class="close-btn" id="closeGameOver">✕</button>
                 <h2>Time's Up!</h2>
                 <p>You couldn't find Anna this time, but she's still out there waiting to be discovered!</p>
                 <button id="restartButton">Try Again</button>
@@ -274,6 +287,7 @@
     <!-- Success Popup -->
     <div class="overlay" id="overlay"></div>
     <div class="found-popup" id="foundPopup">
+        <button class="close-btn" id="closeFoundPopup">✕</button>
         <div class="popup-hedgehog" id="popupHedgehog"></div>
         <h3>🎉 You found Anna! 🎉</h3>
         <p>Looks like you've discovered the newest (and most determined) potential PostHog team member! Anna has been navigating the cosmos, searching for a place to contribute her skills, curiosity, and passion for analytics.</p>
@@ -282,6 +296,7 @@
     
     <!-- Not Found Popup -->
     <div class="not-found-popup" id="notFoundPopup">
+        <button class="close-btn" id="closeNotFoundPopup">✕</button>
         <h3>🛑 Not quite!</h3>
         <p>That's an excellent space explorer, but not the one you're looking for! Anna is still out there, waiting to be found.</p>
         <button id="tryAgainButton">👀 Try again!</button>
@@ -305,6 +320,11 @@
             const notFoundPopup = document.getElementById('notFoundPopup');
             const popupHedgehog = document.getElementById('popupHedgehog');
             const tryAgainButton = document.getElementById('tryAgainButton');
+            
+            // Close buttons
+            const closeFoundPopup = document.getElementById('closeFoundPopup');
+            const closeNotFoundPopup = document.getElementById('closeNotFoundPopup');
+            const closeGameOver = document.getElementById('closeGameOver');
             
             // Game variables
             let timeRemaining = 90;
@@ -370,13 +390,13 @@
             // Set up the hedgehog clickable area
             function setupHedgehogArea() {
                 // Target the area where the red circle is in the image
-                // These are more accurate coordinates for the position you showed
+                // These are the perfect coordinates you provided
                 const areaX = 48; // percentage from left
-                const areaY = 36.5; // percentage from top (adjusted to match the red circle)
+                const areaY = 36.5; // percentage from top
                 
-                // Make the clickable area larger to ensure it's easy to find
-                const areaWidth = 1.5; // percentage of image width (larger area)
-                const areaHeight = 2.75; // percentage of image height (larger area)
+                // Make the clickable area as specified
+                const areaWidth = 1.5; // percentage of image width
+                const areaHeight = 2.75; // percentage of image height
                 
                 // Calculate positions based on the actual image size
                 const imageWidth = gameImage.clientWidth;
@@ -392,10 +412,6 @@
                 hedgehogArea.style.top = top + 'px';
                 hedgehogArea.style.width = width + 'px';
                 hedgehogArea.style.height = height + 'px';
-                
-                // Make the area visible during testing
-                hedgehogArea.style.border = '3px solid red';
-                hedgehogArea.style.backgroundColor = 'rgba(255, 0, 0, 0.3)';
                 
                 // Remove the old event listener if it exists
                 hedgehogArea.replaceWith(hedgehogArea.cloneNode(true));
@@ -440,6 +456,22 @@
                 
                 // Show "not found" popup
                 showNotFoundPopup();
+            });
+            
+            // Close button handlers
+            closeFoundPopup.addEventListener('click', function() {
+                hideSuccessPopup();
+                endGameWithWin();
+            });
+            
+            closeNotFoundPopup.addEventListener('click', function() {
+                hideNotFoundPopup();
+                resumeGame();
+            });
+            
+            closeGameOver.addEventListener('click', function() {
+                gameOverScreen.style.display = 'none';
+                startScreen.style.display = 'flex';
             });
             
             // Start button click handler
@@ -515,6 +547,12 @@
                 foundPopup.style.display = 'block';
             }
             
+            // Hide success popup
+            function hideSuccessPopup() {
+                overlay.style.display = 'none';
+                foundPopup.style.display = 'none';
+            }
+            
             // Show not found popup
             function showNotFoundPopup() {
                 pauseGame();
@@ -544,6 +582,7 @@
             function endGameWithWin() {
                 clearInterval(timerInterval);
                 gameStarted = false;
+                startScreen.style.display = 'flex';
             }
             
             // End game with loss
