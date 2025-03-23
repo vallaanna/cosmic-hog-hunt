@@ -65,11 +65,49 @@
         }
         
 function setupHedgehogArea() {
-    //Center of the red circle from image
+    // Target the area where the red circle is in the image
+    // These are more accurate coordinates for the position you showed
     const areaX = 32; // percentage from left
-    const areaY = 29; // percentage from top
-    const areaWidth = 15; // much larger width
-    const areaHeight = 15; // much larger height
+    const areaY = 28; // percentage from top (adjusted to match the red circle)
+    
+    // Make the clickable area larger to ensure it's easy to find
+    const areaWidth = 12; // percentage of image width (larger area)
+    const areaHeight = 12; // percentage of image height (larger area)
+    
+    // Calculate positions based on the actual image size
+    const imageWidth = gameImage.clientWidth;
+    const imageHeight = gameImage.clientHeight;
+    
+    const left = (areaX / 100) * imageWidth;
+    const top = (areaY / 100) * imageHeight;
+    const width = (areaWidth / 100) * imageWidth;
+    const height = (areaHeight / 100) * imageHeight;
+    
+    // Set the position and size of the clickable area
+    hedgehogArea.style.left = left + 'px';
+    hedgehogArea.style.top = top + 'px';
+    hedgehogArea.style.width = width + 'px';
+    hedgehogArea.style.height = height + 'px';
+    
+    // Make the area visible during testing
+    hedgehogArea.style.border = '3px solid red';
+    hedgehogArea.style.backgroundColor = 'rgba(255, 0, 0, 0.3)';
+    
+    // Remove the old event listener if it exists
+    hedgehogArea.replaceWith(hedgehogArea.cloneNode(true));
+    
+    // Get the fresh reference
+    const freshHedgehogArea = document.getElementById('hedgehogArea');
+    
+    // Add new click event listener
+    freshHedgehogArea.addEventListener('click', function(event) {
+        event.stopPropagation();
+        if (!gameStarted || isGamePaused) return;
+        
+        // Show success popup
+        foundHedgehog();
+    });
+}
     
 }
         
@@ -293,15 +331,34 @@ function setupHedgehogArea() {
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Game elements
-            // Add this right after the document.addEventListener('DOMContentLoaded', function() { line
-// and before any other game setup code
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Game elements
-    const gameContainer = document.getElementById('gameContainer');
-    const gameImage = document.getElementById('gameImage');
+// Game click handler for missed clicks - find this in your code and replace it
+gameContainer.addEventListener('click', function(event) {
+    if (!gameStarted || isGamePaused) return;
     
+    // Ignore clicks on the hedgehog area or other UI elements
+    if (event.target === hedgehogArea) return;
+    if (event.target.id === 'hedgehogArea') return; // Extra check
+    if (event.target !== gameImage) return;
+    
+    const rect = gameContainer.getBoundingClientRect();
+    const clickX = event.clientX - rect.left;
+    const clickY = event.clientY - rect.top;
+    
+    // Create click feedback
+    const feedback = document.createElement('div');
+    feedback.className = 'click-feedback';
+    feedback.style.left = clickX + 'px';
+    feedback.style.top = clickY + 'px';
+    gameContainer.appendChild(feedback);
+    
+    // Remove feedback after animation
+    setTimeout(() => {
+        gameContainer.removeChild(feedback);
+    }, 500);
+    
+    // Show "not found" popup
+    showNotFoundPopup();
+});
     // Add this new click position logger here:
     gameImage.addEventListener('click', function(event) {
         const rect = gameImage.getBoundingClientRect();
