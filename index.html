@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost in Space... or Just Pre-Onboarded?</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #f54e00;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 25px;
+            /* Removed font-style: italic; */
+        }
+        
+        .game-panel {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .game-stat {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .game-container {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            overflow: hidden;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+            cursor: crosshair;
+        }
+        
+        .game-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .hedgehog-area {
+            position: absolute;
+            /* Position will be set in JavaScript based on the specific area */
+            cursor: pointer;
+            z-index: 10;
+            /* Uncomment to debug - shows the clickable area */
+            /* border: 2px solid red; */
+        }
+        
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 100;
+            padding: 20px;
+        }
+        
+        .game-over h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            background-color: #f54e00;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            background-color: #d44400;
+        }
+        
+        .click-feedback {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 2px solid red;
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Popup styles */
+        .found-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            padding: 30px;
+            text-align: center;
+            z-index: 200;
+            display: none;
+            width: 500px;
+            animation: pop-in 0.3s ease-out;
+        }
+        
+        @keyframes pop-in {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        
+        .found-popup h3 {
+            color: #f54e00;
+            margin-top: 0;
+            font-size: 28px;
+        }
+        
+        .found-popup p {
+            margin-bottom: 20px;
+            font-size: 18px;
+            line-height: 1.5;
+        }
+        
+        .popup-hedgehog {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 150;
+            display: none;
+        }
+        
+        .instructions {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #555;
+        }
+        
+        .start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 100;
+            padding: 20px;
+        }
+        
+        .start-screen h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #f54e00;
+            text-align: center;
+        }
+        
+        .start-screen p {
+            margin-bottom: 30px;
+            text-align: center;
+            max-width: 600px;
+            font-size: 18px;
+            line-height: 1.5;
+        }
+        
+        .not-found-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            padding: 30px;
+            text-align: center;
+            z-index: 200;
+            display: none;
+            width: 400px;
+            animation: pop-in 0.3s ease-out;
+        }
+        
+        .not-found-popup h3 {
+            color: #f54e00;
+            margin-top: 0;
+            font-size: 24px;
+        }
+        
+        .email-link {
+            display: inline-block;
+            background-color: #f54e00;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        
+        .email-link:hover {
+            background-color: #d44400;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌌 Lost in Space… or Just Pre-Onboarded?</h1>
+        <div class="subtitle">Anna's eager to join the PostHog team—if you can find her first! 🔎</div>
+        
+        <div class="game-panel">
+            <div class="game-stat">Time: <span id="timer">90</span>s</div>
+        </div>
+        
+        <div class="game-container" id="gameContainer">
+            <img src="wheres_waldo" alt="Anna loves space" class="game-image" id="gameImage">
+            <div class="hedgehog-area" id="hedgehogArea"></div>
+            
+            <div class="start-screen" id="startScreen">
+                <h2>🌌 Lost in Space… or Just Pre-Onboarded?</h2>
+                <p>Anna's eager to join the PostHog team—if you can find her first! 🔎</p>
+                <button id="startButton">📡 Launch the Search – Data Says a New Team Member is Here!</button>
+            </div>
+            
+            <div class="game-over" id="gameOver">
+                <h2>Time's Up!</h2>
+                <p>You couldn't find Anna this time, but she's still out there waiting to be discovered!</p>
+                <button id="restartButton">Try Again</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Success Popup -->
+    <div class="overlay" id="overlay"></div>
+    <div class="found-popup" id="foundPopup">
+        <div class="popup-hedgehog" id="popupHedgehog"></div>
+        <h3>🎉 You found Anna! 🎉</h3>
+        <p>Looks like you've discovered the newest (and most determined) potential PostHog team member! Anna has been navigating the cosmos, searching for a place to contribute her skills, curiosity, and passion for analytics.</p>
+        <a href="mailto:annaallav@gmail.com" class="email-link">🚀 Connect with Anna</a>
+    </div>
+    
+    <!-- Not Found Popup -->
+    <div class="not-found-popup" id="notFoundPopup">
+        <h3>🛑 Not quite!</h3>
+        <p>That's an excellent space explorer, but not the one you're looking for! Anna is still out there, waiting to be found.</p>
+        <button id="tryAgainButton">👀 Try again!</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Game elements
+            const gameContainer = document.getElementById('gameContainer');
+            const gameImage = document.getElementById('gameImage');
+            const timerElement = document.getElementById('timer');
+            const hedgehogArea = document.getElementById('hedgehogArea');
+            const gameOverScreen = document.getElementById('gameOver');
+            const startScreen = document.getElementById('startScreen');
+            const startButton = document.getElementById('startButton');
+            const restartButton = document.getElementById('restartButton');
+            
+            // Popup elements
+            const overlay = document.getElementById('overlay');
+            const foundPopup = document.getElementById('foundPopup');
+            const notFoundPopup = document.getElementById('notFoundPopup');
+            const popupHedgehog = document.getElementById('popupHedgehog');
+            const tryAgainButton = document.getElementById('tryAgainButton');
+            
+            // Game variables
+            let timeRemaining = 90;
+            let timerInterval;
+            let isGamePaused = false;
+            let gameStarted = false;
+            
+            // PostHog hedgehog SVG with party hat and computer
+            const hedgehogPopupSVG = `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                    <!-- Body -->
+                    <ellipse cx="50" cy="50" rx="30" ry="26" fill="#f0b68f"/>
+                    
+                    <!-- Spikes -->
+                    <path d="M70,50 Q90,30 70,20 Q100,10 60,10 Q80,0 50,0 Q60,-10 40,0 Q20,-10 30,10 Q0,0 20,20 Q0,30 20,40 Q0,50 30,60 Q10,70 40,70 Q30,80 50,80 Q70,80 60,70 Q90,70 70,50" fill="#885533"/>
+                    
+                    <!-- Party Hat -->
+                    <path d="M50,0 L30,20 L70,20 Z" fill="#5555ff"/>
+                    <path d="M50,0 L40,20 L60,20 Z" fill="#7777ff"/>
+                    <circle cx="50" cy="6" r="2" fill="yellow"/>
+                    <circle cx="44" cy="12" r="2" fill="yellow"/>
+                    <circle cx="56" cy="12" r="2" fill="yellow"/>
+                    <circle cx="50" cy="18" r="2" fill="yellow"/>
+                    
+                    <!-- Face -->
+                    <circle cx="40" cy="40" r="4" fill="#000"/>
+                    <circle cx="60" cy="40" r="4" fill="#000"/>
+                    <path d="M44,48 Q50,52 56,48" stroke="#333" stroke-width="3" fill="none"/>
+                    
+                    <!-- Ears -->
+                    <circle cx="30" cy="30" r="6" fill="#f0b68f"/>
+                    <circle cx="70" cy="30" r="6" fill="#f0b68f"/>
+                    
+                    <!-- Orange Shirt -->
+                    <path d="M30,60 Q50,70 70,60 L70,90 L30,90 Z" fill="#f54e00"/>
+                    
+                    <!-- Laptop/Computer -->
+                    <g transform="translate(10, 64) rotate(-10)">
+                        <!-- Base -->
+                        <rect x="0" y="0" width="24" height="16" fill="#333"/>
+                        <!-- Screen -->
+                        <rect x="0" y="-14" width="24" height="14" fill="#333"/>
+                        <rect x="2" y="-12" width="20" height="10" fill="#6FC3FF"/>
+                        <!-- PostHog Logo on Screen -->
+                        <circle cx="12" cy="-7" r="3" fill="#f54e00"/>
+                    </g>
+                </svg>
+            `;
+            
+            // Set up the hedgehog clickable area
+            // The values are approximate percentages of where the hedgehog is in the image
+            function setupHedgehogArea() {
+                // Center of the red circle from image 2
+                const areaX = 31; // percentage from left
+                const areaY = 33; // percentage from top
+                const areaWidth = 5; // percentage of image width
+                const areaHeight = 5; // percentage of image height
+                
+                // Calculate positions based on the actual image size
+                const imageWidth = gameImage.clientWidth;
+                const imageHeight = gameImage.clientHeight;
+                
+                const left = (areaX / 100) * imageWidth;
+                const top = (areaY / 100) * imageHeight;
+                const width = (areaWidth / 100) * imageWidth;
+                const height = (areaHeight / 100) * imageHeight;
+                
+                // Set the position and size of the clickable area
+                hedgehogArea.style.left = left + 'px';
+                hedgehogArea.style.top = top + 'px';
+                hedgehogArea.style.width = width + 'px';
+                hedgehogArea.style.height = height + 'px';
+                
+                // Add click event for finding the hedgehog
+                hedgehogArea.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    if (!gameStarted || isGamePaused) return;
+                    
+                    // Show success popup
+                    foundHedgehog();
+                });
+            }
+            
+            // Game click handler for missed clicks
+            gameContainer.addEventListener('click', function(event) {
+                if (!gameStarted || isGamePaused) return;
+                
+                // Ignore clicks on the hedgehog area or other UI elements
+                if (event.target === hedgehogArea) return;
+                if (event.target !== gameImage) return;
+                
+                const rect = gameContainer.getBoundingClientRect();
+                const clickX = event.clientX - rect.left;
+                const clickY = event.clientY - rect.top;
+                
+                // Create click feedback
+                const feedback = document.createElement('div');
+                feedback.className = 'click-feedback';
+                feedback.style.left = clickX + 'px';
+                feedback.style.top = clickY + 'px';
+                gameContainer.appendChild(feedback);
+                
+                // Remove feedback after animation
+                setTimeout(() => {
+                    gameContainer.removeChild(feedback);
+                }, 500);
+                
+                // Show "not found" popup
+                showNotFoundPopup();
+            });
+            
+            // Start button click handler
+            startButton.addEventListener('click', function() {
+                startScreen.style.display = 'none';
+                startGame();
+            });
+            
+            // Try again button click handler
+            tryAgainButton.addEventListener('click', function() {
+                hideNotFoundPopup();
+                resumeGame();
+            });
+            
+            // Restart button click handler
+            restartButton.addEventListener('click', startGame);
+            
+            // Found the hedgehog
+            function foundHedgehog() {
+                pauseGame();
+                
+                // Set popup content
+                popupHedgehog.innerHTML = hedgehogPopupSVG;
+                
+                // Show popup
+                showSuccessPopup();
+            }
+            
+            // Start game
+            function startGame() {
+                // Reset game state
+                timeRemaining = 90;
+                isGamePaused = false;
+                
+                // Update UI
+                timerElement.textContent = timeRemaining;
+                gameOverScreen.style.display = 'none';
+                
+                // Setup the hedgehog area
+                setupHedgehogArea();
+                
+                // Start timer
+                startTimer();
+                
+                // Game is now started
+                gameStarted = true;
+            }
+            
+            // Start timer
+            function startTimer() {
+                clearInterval(timerInterval);
+                timerInterval = setInterval(updateTimer, 1000);
+            }
+            
+            // Pause timer
+            function pauseTimer() {
+                clearInterval(timerInterval);
+            }
+            
+            // Update timer
+            function updateTimer() {
+                timeRemaining--;
+                timerElement.textContent = timeRemaining;
+                
+                if (timeRemaining <= 0) {
+                    endGameWithLoss();
+                }
+            }
+            
+            // Show success popup
+            function showSuccessPopup() {
+                overlay.style.display = 'block';
+                foundPopup.style.display = 'block';
+            }
+            
+            // Show not found popup
+            function showNotFoundPopup() {
+                pauseGame();
+                overlay.style.display = 'block';
+                notFoundPopup.style.display = 'block';
+            }
+            
+            // Hide not found popup
+            function hideNotFoundPopup() {
+                overlay.style.display = 'none';
+                notFoundPopup.style.display = 'none';
+            }
+            
+            // Pause game
+            function pauseGame() {
+                isGamePaused = true;
+                pauseTimer();
+            }
+            
+            // Resume game
+            function resumeGame() {
+                isGamePaused = false;
+                startTimer();
+            }
+            
+            // End game with win
+            function endGameWithWin() {
+                clearInterval(timerInterval);
+                gameStarted = false;
+            }
+            
+            // End game with loss
+            function endGameWithLoss() {
+                clearInterval(timerInterval);
+                gameStarted = false;
+                gameOverScreen.style.display = 'flex';
+            }
+            
+            // Handle window resize to adjust hedgehog area position
+            window.addEventListener('resize', function() {
+                if (gameStarted) {
+                    setupHedgehogArea();
+                }
+            });
+            
+            // Make sure the image is loaded before setting up the game
+            gameImage.onload = function() {
+                // Image is ready, show the start screen
+                startScreen.style.display = 'flex';
+            };
+        });
+    </script>
+</body>
+</html>
