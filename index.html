@@ -91,15 +91,17 @@
         }
         
         button {
-            background-color: #f54e00;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            font-weight: bold;
+    background-color: #F7A501; 
+    color: black;               
+    border: none;
+    padding: 12px 24px;         
+    font-size: 16px;
+    border-radius: 8px;         
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-weight: bold;
+    box-shadow: 0 4px 0 #D28A01; 
+    text-align: center;
         }
         
         button:hover {
@@ -118,20 +120,21 @@
         
         /* Popup styles */
         .found-popup, .not-found-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-            padding: 30px;
-            text-align: center;
-            z-index: 200;
-            display: none;
-            width: 500px;
-            animation: pop-in 0.3s ease-out;
-            position: relative;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 8px;          
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    padding: 30px;
+    text-align: center;
+    z-index: 200;
+    display: none;
+    width: 500px;
+    animation: pop-in 0.3s ease-out;
+    position: relative;
+    border: 1px solid #EBEBEB;
         }
         
         .not-found-popup {
@@ -139,22 +142,24 @@
         }
         
         .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 30px;
-            height: 30px;
-            background-color: #f54e00;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 18px;
-            line-height: 1;
-            border: none;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 24px;
+    height: 24px;
+    background-color: transparent;  
+    color: #888;                   
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 1;
+    border: none;
+    box-shadow: none;               
+    padding: 0;                     
         }
         
         .close-btn:hover {
@@ -167,7 +172,7 @@
         }
         
         .found-popup h3 {
-            color: #f54e00;
+            color: #000;
             margin-top: 0;
             font-size: 28px;
         }
@@ -176,6 +181,7 @@
             margin-bottom: 20px;
             font-size: 18px;
             line-height: 1.5;
+            color: #444;
         }
         
         .popup-hedgehog {
@@ -234,21 +240,22 @@
         }
         
         .not-found-popup h3 {
-            color: #f54e00;
+            color: #000;
             margin-top: 0;
             font-size: 24px;
         }
         
         .email-link {
-            display: inline-block;
-            background-color: #f54e00;
-            color: white;
-            text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            margin-top: 10px;
-            font-weight: bold;
-            transition: background-color 0.2s;
+    display: inline-block;
+    background-color: #F7A501;    
+    color: black;                 
+    text-decoration: none;
+    padding: 12px 24px;           
+    border-radius: 8px;           
+    margin-top: 10px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    box-shadow: 0 4px 0 #D28A01; 
         }
         
         .email-link:hover {
